@@ -17,7 +17,7 @@ EXTF = \\META-INF\\AIR\\extensions\\$(EID)\\META-INF\\ANE\\$(PLATFORM)\\
 $(ANE): $(SWC) $(DESC) # $(LIB)
 	./7z e -x!catalog.xml $(SWC)
 	move /Y library.swf platforms/$(PLATFORM)
-	$(ADT) -package -target ane $(ANE) $(DESC) -swc $(SWC) -platform Windows-x86 -C platforms/$(PLATFORM) .
+	$(ADT) -package -target ane $(ANE) $(DESC) -swc $(SWC) -platform $(PLATFORM) -C platforms/$(PLATFORM) .
 	copy platforms\\Windows-x86\\library.swf $(PROJ)$(EXTF)
 	copy $(ANE) $(PROJ)\\..\\
 
