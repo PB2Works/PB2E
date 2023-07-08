@@ -25,20 +25,6 @@ extern "C"
 	__declspec(dllexport) void extensionFinalizer(void* extData);
 }
 
-FREObject AS3_helloWorld(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
-	const char* hello = "Yex was looking at this!";
-	unsigned int helloLength = strlen(hello) + 1;
-	FREObject obj;
-	FRENewObjectFromUTF8(helloLength, _AIRS(hello), &obj);
-	return obj;
-}
-
-FREObject AS3_helloProsu(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
-	FREObject obj;
-	FRENewObjectFromUint32(6969420, &obj);
-	return obj;
-}
-
 FREObject AS3_setStageSize(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
 	if (argc >= 2) {
 		FREGetObjectAsDouble(argv[0], &stageWidth);
@@ -53,25 +39,23 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 #define A3F(id, fname, func) funcs[id].name = _AIRS(fname); \
 							 funcs[id].functionData = NULL; \
 							 funcs[id].function = &func
-#define NUM_AS3_FUNCS 16
+#define NUM_AS3_FUNCS 14
 	FRENamedFunction* funcs = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * NUM_AS3_FUNCS);
 	if (funcs != NULL) {
-		A3F(0, "helloWorld", AS3_helloWorld);
-		A3F(1, "helloProsu", AS3_helloProsu);
-		A3F(2, "pollMouse", AS3_pollMouse);
-		A3F(3, "pollKeys", AS3_pollKeys);
-		A3F(4, "setStageSize", AS3_setStageSize);
-		A3F(5, "LUA", AS3_LUA);
-		A3F(6, "LUA_Close", AS3_LUA_Close);
-		A3F(7, "LUA_DoString", AS3_LUA_DoString);
-		A3F(8, "LUA_GetError", AS3_LUA_GetError);
-		A3F(9, "LUA_SetGlobal", AS3_LUA_SetGlobal);
-		A3F(10, "LUA_GetGlobal", AS3_LUA_GetGlobal);
-		A3F(11, "LUA_CallFunction", AS3_LUA_CallFunction);
-		A3F(12, "LUA_RegArg", AS3_LUA_RegisterArgument);
-		A3F(13, "LUA_CRegFunc", AS3_LUA_CallRegisteredFunction);
-		A3F(14, "LUA_DefMeta", AS3_LUA_RegisterGlobalMetatable);
-		A3F(15, "LUA_NewMeta", AS3_LUA_NewMetaObject);
+		A3F(0, "pollMouse", AS3_pollMouse);
+		A3F(1, "pollKeys", AS3_pollKeys);
+		A3F(2, "setStageSize", AS3_setStageSize);
+		A3F(3, "LUA", AS3_LUA);
+		A3F(4, "LUA_Close", AS3_LUA_Close);
+		A3F(5, "LUA_DoString", AS3_LUA_DoString);
+		A3F(6, "LUA_GetError", AS3_LUA_GetError);
+		A3F(7, "LUA_SetGlobal", AS3_LUA_SetGlobal);
+		A3F(8, "LUA_GetGlobal", AS3_LUA_GetGlobal);
+		A3F(9, "LUA_CallFunction", AS3_LUA_CallFunction);
+		A3F(10, "LUA_RegArg", AS3_LUA_RegisterArgument);
+		A3F(11, "LUA_CRegFunc", AS3_LUA_CallRegisteredFunction);
+		A3F(12, "LUA_DefMeta", AS3_LUA_RegisterGlobalMetatable);
+		A3F(13, "LUA_NewMeta", AS3_LUA_NewMetaObject);
 		*numFunctionsToSet = NUM_AS3_FUNCS;
 		*functionsToSet = funcs;
 	} else {
