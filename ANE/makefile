@@ -15,7 +15,7 @@ PROJ = "$(PB2EX_DIR)\\pb2_re34_alt_p.app"
 EXTF = \\META-INF\\AIR\\extensions\\$(EID)\\META-INF\\ANE\\$(PLATFORM)\\
 
 $(ANE): $(SWC) $(DESC) # $(LIB)
-	./7z e -x!catalog.xml $(SWC)
+	./7z -y e -x!catalog.xml $(SWC)
 	move /Y library.swf platforms/$(PLATFORM)
 	$(ADT) -package -target ane $(ANE) $(DESC) -swc $(SWC) -platform $(PLATFORM) -C platforms/$(PLATFORM) .
 	copy platforms\\Windows-x86\\library.swf $(PROJ)$(EXTF)
