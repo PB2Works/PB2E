@@ -58,20 +58,5 @@ package com.pb2works
 		public function get mouseY() : Number {
 			return Number(extData.my);
 		}
-
-		public function hmm() : * {
-			return extData.k_n + " " + extData.k_ev;
-		}
-
-		public function helloWorld() : String  {
-			// Calls the native function helloWorld. Name must match the
-			// name specified to the runtime during the extensionContext's
-			// initialization, otherwise you will obviously get error #3500.
-			return ctx.call("helloWorld") as String;
-		}
-
-		public function helloProsu() : int {
-			return ctx.call("helloProsu") as int;
-		}
 	}
 }
