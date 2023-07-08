@@ -1,6 +1,7 @@
-*.dll
-*.o
 *.ane
 *.swc
-*.exp
-*.lib
+*.swf
+*.dll
+.vs/
+Release/
+Debug/
