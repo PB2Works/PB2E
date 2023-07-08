@@ -10,6 +10,78 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ane_main.cpp" />
+    <ClCompile Include="src\as3lua.cpp" />
+    <ClCompile Include="src\inputex.cpp" />
+    <ClCompile Include="src\lapi.c" />
+    <ClCompile Include="src\lauxlib.c" />
+    <ClCompile Include="src\lbaselib.c" />
+    <ClCompile Include="src\lcode.c" />
+    <ClCompile Include="src\lcorolib.c" />
+    <ClCompile Include="src\lctype.c" />
+    <ClCompile Include="src\ldblib.c" />
+    <ClCompile Include="src\ldebug.c" />
+    <ClCompile Include="src\ldo.c" />
+    <ClCompile Include="src\ldump.c" />
+    <ClCompile Include="src\lfunc.c" />
+    <ClCompile Include="src\lgc.c" />
+    <ClCompile Include="src\linit.c" />
+    <ClCompile Include="src\liolib.c" />
+    <ClCompile Include="src\llex.c" />
+    <ClCompile Include="src\lmathlib.c" />
+    <ClCompile Include="src\lmem.c" />
+    <ClCompile Include="src\loadlib.c" />
+    <ClCompile Include="src\lobject.c" />
+    <ClCompile Include="src\lopcodes.c" />
+    <ClCompile Include="src\loslib.c" />
+    <ClCompile Include="src\lparser.c" />
+    <ClCompile Include="src\lstate.c" />
+    <ClCompile Include="src\lstring.c" />
+    <ClCompile Include="src\lstrlib.c" />
+    <ClCompile Include="src\ltable.c" />
+    <ClCompile Include="src\ltablib.c" />
+    <ClCompile Include="src\ltm.c" />
+    <ClCompile Include="src\luac.c" />
+    <ClCompile Include="src\lundump.c" />
+    <ClCompile Include="src\lutf8lib.c" />
+    <ClCompile Include="src\lvm.c" />
+    <ClCompile Include="src\lzio.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ane.h" />
+    <ClInclude Include="src\as3lua.h" />
+    <ClInclude Include="src\inputex.h" />
+    <ClInclude Include="src\lapi.h" />
+    <ClInclude Include="src\lauxlib.h" />
+    <ClInclude Include="src\lcode.h" />
+    <ClInclude Include="src\lctype.h" />
+    <ClInclude Include="src\ldebug.h" />
+    <ClInclude Include="src\ldo.h" />
+    <ClInclude Include="src\lfunc.h" />
+    <ClInclude Include="src\lgc.h" />
+    <ClInclude Include="src\ljumptab.h" />
+    <ClInclude Include="src\llex.h" />
+    <ClInclude Include="src\llimits.h" />
+    <ClInclude Include="src\lmem.h" />
+    <ClInclude Include="src\lobject.h" />
+    <ClInclude Include="src\lopcodes.h" />
+    <ClInclude Include="src\lopnames.h" />
+    <ClInclude Include="src\lparser.h" />
+    <ClInclude Include="src\lprefix.h" />
+    <ClInclude Include="src\lstate.h" />
+    <ClInclude Include="src\lstring.h" />
+    <ClInclude Include="src\ltable.h" />
+    <ClInclude Include="src\ltm.h" />
+    <ClInclude Include="src\lua.h" />
+    <ClInclude Include="src\lua.hpp" />
+    <ClInclude Include="src\luaconf.h" />
+    <ClInclude Include="src\lualib.h" />
+    <ClInclude Include="src\lundump.h" />
+    <ClInclude Include="src\lvm.h" />
+    <ClInclude Include="src\lzio.h" />
+    <ClInclude Include="src\main.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{44A49CFF-311C-42B1-983E-158E3AA0CC55}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -98,75 +170,6 @@
       <Command>"$(MSBuildProjectDirectory)\bat\PostBuild.bat" "$(OutputPath)$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="as3lua.cpp" />
-    <ClCompile Include="inputex.cpp" />
-    <ClCompile Include="lapi.c" />
-    <ClCompile Include="lauxlib.c" />
-    <ClCompile Include="lbaselib.c" />
-    <ClCompile Include="lcode.c" />
-    <ClCompile Include="lcorolib.c" />
-    <ClCompile Include="lctype.c" />
-    <ClCompile Include="ldblib.c" />
-    <ClCompile Include="ldebug.c" />
-    <ClCompile Include="ldo.c" />
-    <ClCompile Include="ldump.c" />
-    <ClCompile Include="lfunc.c" />
-    <ClCompile Include="lgc.c" />
-    <ClCompile Include="linit.c" />
-    <ClCompile Include="liolib.c" />
-    <ClCompile Include="llex.c" />
-    <ClCompile Include="lmathlib.c" />
-    <ClCompile Include="lmem.c" />
-    <ClCompile Include="loadlib.c" />
-    <ClCompile Include="lobject.c" />
-    <ClCompile Include="lopcodes.c" />
-    <ClCompile Include="loslib.c" />
-    <ClCompile Include="lparser.c" />
-    <ClCompile Include="lstate.c" />
-    <ClCompile Include="lstring.c" />
-    <ClCompile Include="lstrlib.c" />
-    <ClCompile Include="ltable.c" />
-    <ClCompile Include="ltablib.c" />
-    <ClCompile Include="ltm.c" />
-    <ClCompile Include="lundump.c" />
-    <ClCompile Include="lutf8lib.c" />
-    <ClCompile Include="lvm.c" />
-    <ClCompile Include="lzio.c" />
-    <ClCompile Include="ane_main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ane.h" />
-    <ClInclude Include="as3lua.h" />
-    <ClInclude Include="inputex.h" />
-    <ClInclude Include="lapi.h" />
-    <ClInclude Include="lauxlib.h" />
-    <ClInclude Include="lcode.h" />
-    <ClInclude Include="lctype.h" />
-    <ClInclude Include="ldebug.h" />
-    <ClInclude Include="ldo.h" />
-    <ClInclude Include="lfunc.h" />
-    <ClInclude Include="lgc.h" />
-    <ClInclude Include="llex.h" />
-    <ClInclude Include="llimits.h" />
-    <ClInclude Include="lmem.h" />
-    <ClInclude Include="lobject.h" />
-    <ClInclude Include="lopcodes.h" />
-    <ClInclude Include="lparser.h" />
-    <ClInclude Include="lprefix.h" />
-    <ClInclude Include="lstate.h" />
-    <ClInclude Include="lstring.h" />
-    <ClInclude Include="ltable.h" />
-    <ClInclude Include="ltm.h" />
-    <ClInclude Include="lua.h" />
-    <ClInclude Include="lua.hpp" />
-    <ClInclude Include="luaconf.h" />
-    <ClInclude Include="lualib.h" />
-    <ClInclude Include="lundump.h" />
-    <ClInclude Include="lvm.h" />
-    <ClInclude Include="lzio.h" />
-    <ClInclude Include="main.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
