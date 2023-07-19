@@ -34,12 +34,40 @@ FREObject AS3_setStageSize(FREContext ctx, void* funcData, uint32_t argc, FREObj
 	return NULL;
 }
 
+#define N_PERF_COUNTERS 20
+static LARGE_INTEGER perfCounters[N_PERF_COUNTERS];
+
+FREObject AS3_getPerformanceFrequency(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+	LARGE_INTEGER li;
+	FREObject as3_n;
+	QueryPerformanceFrequency(&li);
+	FRENewObjectFromUint32(li.QuadPart, &as3_n);
+	return as3_n;
+}
+
+FREObject AS3_startMeasure(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+	uint32_t n;
+	FREGetObjectAsUint32(argv[0], &n);
+	QueryPerformanceCounter(&(perfCounters[n]));
+	return NULL;
+}
+
+FREObject AS3_stopMeasure(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+	uint32_t n;
+	LARGE_INTEGER li;
+	FREObject as3_value;
+	FREGetObjectAsUint32(argv[0], &n);
+	QueryPerformanceCounter(&li);
+	FRENewObjectFromUint32(li.QuadPart - perfCounters[n].QuadPart, &as3_value);
+	return as3_value;
+}
+
 void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctionsToSet, const FRENamedFunction** functionsToSet)
 {
 #define A3F(id, fname, func) funcs[id].name = _AIRS(fname); \
 							 funcs[id].functionData = NULL; \
 							 funcs[id].function = &func
-#define NUM_AS3_FUNCS 14
+#define NUM_AS3_FUNCS 17
 	FRENamedFunction* funcs = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * NUM_AS3_FUNCS);
 	if (funcs != NULL) {
 		A3F(0, "pollMouse", AS3_pollMouse);
@@ -56,6 +84,9 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 		A3F(11, "LUA_CRegFunc", AS3_LUA_CallRegisteredFunction);
 		A3F(12, "LUA_DefMeta", AS3_LUA_RegisterGlobalMetatable);
 		A3F(13, "LUA_NewMeta", AS3_LUA_NewMetaObject);
+		A3F(14, "perfFrequency", AS3_getPerformanceFrequency);
+		A3F(15, "t1", AS3_startMeasure);
+		A3F(16, "t2", AS3_stopMeasure);
 		*numFunctionsToSet = NUM_AS3_FUNCS;
 		*functionsToSet = funcs;
 	} else {

@@ -191,7 +191,7 @@ FREObject AS3_LUA_CallRegisteredFunction(FREContext ctx, void* funcData, uint32_
 		lua_prep(L, ctx);
 		lua_getfield(L, LUA_REGISTRYINDEX, LAS3_REG_NAME);
 		lua_rawgeti(L, -1, rid);
-		for (int i = 2; i < argc; i++) pushAS3Value(L, argv[i]);
+		for (uint32_t i = 2; i < argc; i++) pushAS3Value(L, argv[i]);
 		// printf("[LUA %d] CallRegisteredFunction(%d, %d) with %d args\n", Ln, Ln, rid, argc-2);
 		if (lua_pcall(L, argc - 2, 0, 0) != LUA_OK) {
 			FREObject asErr;
@@ -393,7 +393,7 @@ FREObject AS3_LUA_NewMetaObject(FREContext ctx, void* funcData, uint32_t argc, F
 		L = luaStates[Ln];
 		mobj = (luamobj*) lua_newuserdata(L, sizeof(luamobj));
 		mobj->id = id;
-		printf("+++++++++ NEW META OBJECT: %ld & %d\n", mobj, lua_gettop(L));
+		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int) mobj, lua_gettop(L));
 		luaL_setmetatable(L, (const char*) className);
 		FRENewObjectFromInt32(1, &asId);
 		// lua_pop(L, 1);
@@ -437,7 +437,7 @@ FREObject AS3_LUA_Close(FREContext ctx, void* funcData, uint32_t argc, FREObject
 		L = luaStates[Ln];
 		Le = *((luaextra**)lua_getextraspace(L));
 		if (Ln >= 0 && Ln < LAS3_MAX_STATES && (L != NULL)) {
-			printf("[LUA %d] Closing... %d %d\n", Le->Ln, Le->ctx, ctx);
+			printf("[LUA %d] Closing... %d == %d\n", Le->Ln, (int) Le->ctx, (int) ctx);
 			lua_close(L);
 			free(Le);
 			luaStates[Ln] = NULL;

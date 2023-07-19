@@ -30,7 +30,7 @@ package com.pb2works.lua
 			doString("local AS3 = __AS3; function " + fname + "(...) return AS3(\"" + fname + "\", ...) end" , "internal_redir");
 		}
 
-		public function addFunction2(fname, func:Function) {
+		public function addFunction2(fname, func:Function) : void {
 			extData.lf[L][fname] = func;
 		}
 

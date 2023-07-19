@@ -10,6 +10,8 @@ package com.pb2works
 		private var extData:Object;
 		private var stage:Stage;
 		private var main:MovieClip;
+		private var measures:Vector.<uint>;
+		private var perfFreq:Number;
 
 		public function PB2E(main:MovieClip) {
 			this.stage = main.stage;
@@ -33,6 +35,9 @@ package com.pb2works
 			extData = ctx.actionScriptData;
 
 			ctx.call("setStageSize", stage.stageWidth, stage.stageHeight);
+
+			measures = new Vector.<uint>(20);
+			perfFreq = Number(ctx.call("perfFrequency") as uint);
 		}
 
 		public function getMain() : MovieClip {
@@ -57,6 +62,18 @@ package com.pb2works
 
 		public function get mouseY() : Number {
 			return Number(extData.my);
+		}
+
+		public function getTime(n:uint) : Number {
+			return measures[n] / perfFreq * 1000000.0;
+		}
+
+		public function startMeasure(n:uint) : void {
+			ctx.call("t1", n);
+		}
+
+		public function stopMeasure(n:uint) : void {
+			measures[n] = ctx.call("t2", n) as uint;
 		}
 	}
 }
