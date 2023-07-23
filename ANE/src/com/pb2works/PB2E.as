@@ -11,7 +11,7 @@ package com.pb2works
 		private var stage:Stage;
 		private var main:MovieClip;
 		private var measures:Vector.<uint>;
-		private var perfFreq:Number;
+		private var perfFactor:Number;
 
 		public function PB2E(main:MovieClip) {
 			this.stage = main.stage;
@@ -19,14 +19,8 @@ package com.pb2works
 			ctx = ExtensionContext.createExtensionContext("com.pb2works.PB2E", null);
 			ctx.addEventListener(StatusEvent.STATUS, function(ev:StatusEvent) : void {
 				if (ev.code == "key") {
-					var kev:KeyboardEvent;
 					pollKeys();
-					// kev = new KeyboardEvent(ev.level == "up" ? KeyboardEvent.KEY_UP : KeyboardEvent.KEY_DOWN, true, false, extData.k_char, extData.k_code);
-					// dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_DOWN));
-					// dispatchEvent(kev);
-					for (var i:int = 0; i < extData.k_n; i++) {
-						dispatchEvent(extData.k_ev[i]);
-					}
+					for (var i:int = 0; i < extData.k_n; i++) dispatchEvent(extData.k_ev[i]);
 				} else if (ev.code == "ms") {
 					if (ev.level == "d") dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
 					else dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
@@ -37,7 +31,7 @@ package com.pb2works
 			ctx.call("setStageSize", stage.stageWidth, stage.stageHeight);
 
 			measures = new Vector.<uint>(20);
-			perfFreq = Number(ctx.call("perfFrequency") as uint);
+			perfFactor = 1000000.0 / Number(ctx.call("perfFrequency") as uint);
 		}
 
 		public function getMain() : MovieClip {
@@ -65,7 +59,9 @@ package com.pb2works
 		}
 
 		public function getTime(n:uint) : Number {
-			return measures[n] / perfFreq * 1000000.0;
+			var v:Number = measures[n] * perfFactor;
+			measures[n] = 0.0; 
+			return v;
 		}
 
 		public function startMeasure(n:uint) : void {
@@ -73,7 +69,7 @@ package com.pb2works
 		}
 
 		public function stopMeasure(n:uint) : void {
-			measures[n] = ctx.call("t2", n) as uint;
+			measures[n] += ctx.call("t2", n) as uint;
 		}
 	}
 }
