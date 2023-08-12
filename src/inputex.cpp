@@ -17,7 +17,7 @@ static DWORD kb_keys[MAX_BUFF_KEYS];
 static char kb_keyChars[MAX_BUFF_KEYS];
 static int kb_inQueue;
 static LONG lastMouseX, lastMouseY;
-static BOOL last_foreground;
+static BOOL sent_mouse_up;
 
 static HANDLE hThreadInput = NULL;
 static DWORD dwThreadInput = 0;
@@ -125,17 +125,28 @@ static LRESULT CALLBACK inputWindowProc(HWND hwnd, UINT Message, WPARAM wParam, 
 			{
 				POINT mousePos;
 				RAWMOUSE ms = raw->data.mouse;
+				BOOL mouseInWindow;
 				GetCursorPos(&mousePos);
-				lastMouseX = mousePos.x;
-				lastMouseY = mousePos.y;
+				mouseInWindow = !sent_mouse_up || (WindowFromPoint(mousePos) == main_window);
+				if (mouseInWindow) {
+					lastMouseX = mousePos.x;
+					lastMouseY = mousePos.y;
+				}
 				if (ms.usButtonFlags != 0) {
-					BOOL foreground = (GetForegroundWindow() == main_window);
-					if (!foreground && last_foreground) FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("u"));
-					else {
+					if (!mouseInWindow && !sent_mouse_up) {
+						FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("u"));
+						sent_mouse_up = true;
+					}
+					if (mouseInWindow) {
 						// printf("Mouse state: %d\n", ms.usButtonFlags);
-						if (ms.usButtonFlags == RI_MOUSE_LEFT_BUTTON_DOWN) FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("d"));
-						else if (ms.usButtonFlags == RI_MOUSE_LEFT_BUTTON_UP) FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("u"));
-						last_foreground = foreground;
+						if (ms.usButtonFlags == RI_MOUSE_LEFT_BUTTON_DOWN) {
+							FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("d"));
+							sent_mouse_up = false;
+						}
+						else if (ms.usButtonFlags == RI_MOUSE_LEFT_BUTTON_UP) {
+							FREDispatchStatusEventAsync(fre_ctx, _AIRS("ms"), _AIRS("u"));
+							sent_mouse_up = true;
+						}
 					}
 				}
 				// printf("RawMouse: %d %d\n", ms.lLastX, ms.lLastY);
@@ -210,7 +221,7 @@ DWORD WINAPI THREAD_input(void* vargp) {
 	Rid[1].usUsage = 0x06;               // HID_USAGE_GENERIC_KEYBOARD
 	Rid[1].dwFlags = RIDEV_INPUTSINK;    // Always receive inputs
 	Rid[1].hwndTarget = input_window;
-	last_foreground = true;
+	sent_mouse_up = true;
 	if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
 	{
 		printf("Error: Raw Input registration failed.\n");
