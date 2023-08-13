@@ -67,32 +67,32 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 {
 #define A3F(id, fname, func) funcs[id].name = _AIRS(fname); \
 							 funcs[id].functionData = NULL; \
-							 funcs[id].function = &func
+							 funcs[id].function = &AS3_##func
 #define NUM_AS3_FUNCS 22
 	FRENamedFunction* funcs = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * NUM_AS3_FUNCS);
 	if (funcs != NULL) {
-		A3F(0, "pollMouse", AS3_pollMouse);
-		A3F(1, "pollKeys", AS3_pollKeys);
-		A3F(2, "setStageSize", AS3_setStageSize);
-		A3F(3, "LUA", AS3_LUA);
-		A3F(4, "LUA_Close", AS3_LUA_Close);
-		A3F(5, "LUA_DoString", AS3_LUA_DoString);
-		A3F(6, "LUA_GetError", AS3_LUA_GetError);
-		A3F(7, "LUA_SetGlobal", AS3_LUA_SetGlobal);
-		A3F(8, "LUA_GetGlobal", AS3_LUA_GetGlobal);
-		A3F(9, "LUA_CallFunction", AS3_LUA_CallFunction);
-		A3F(10, "LUA_RegArg", AS3_LUA_RegisterArgument);
-		A3F(11, "LUA_CRegFunc", AS3_LUA_CallRegisteredFunction);
-		A3F(12, "LUA_DefMeta", AS3_LUA_RegisterGlobalMetatable);
-		A3F(13, "LUA_NewMeta", AS3_LUA_NewMetaObject);
-		A3F(14, "perfFrequency", AS3_getPerformanceFrequency);
-		A3F(15, "t1", AS3_startMeasure);
-		A3F(16, "t2", AS3_stopMeasure);
-		A3F(17, "NET_NewUDP", AS3_NET_newUDPSocket);
-		A3F(18, "NET_CloseUDP", AS3_NET_closeUDPSocket);
-		A3F(19, "NET_PollUDP", AS3_NET_PollUDP);
-		A3F(20, "NET_SendUDP", AS3_NET_SendUDP);
-		A3F(21, "NET_DNS", AS3_NET_DNS);
+		A3F(0, "pollMouse", pollMouse);
+		A3F(1, "pollKeys", pollKeys);
+		A3F(2, "setStageSize", setStageSize);
+		A3F(3, "LUA", LUA);
+		A3F(4, "LUA_Close", LUA_Close);
+		A3F(5, "LUA_DoString", LUA_DoString);
+		A3F(6, "LUA_GetError", LUA_GetError);
+		A3F(7, "LUA_SetGlobal", LUA_SetGlobal);
+		A3F(8, "LUA_GetGlobal", LUA_GetGlobal);
+		A3F(9, "LUA_CallFunction", LUA_CallFunction);
+		A3F(10, "LUA_RegArg", LUA_RegisterArgument);
+		A3F(11, "LUA_CRegFunc", LUA_CallRegisteredFunction);
+		A3F(12, "LUA_DefMeta", LUA_RegisterGlobalMetatable);
+		A3F(13, "LUA_NewMeta", LUA_NewMetaObject);
+		A3F(14, "perfFrequency", getPerformanceFrequency);
+		A3F(15, "t1", startMeasure);
+		A3F(16, "t2", stopMeasure);
+		A3F(17, "NET_NewUDP", NET_newUDPSocket);
+		A3F(18, "NET_CloseUDP", NET_closeUDPSocket);
+		A3F(19, "NET_PollUDP", NET_PollUDP);
+		A3F(20, "NET_SendUDP", NET_SendUDP);
+		A3F(21, "NET_DNS", NET_DNS);
 		*numFunctionsToSet = NUM_AS3_FUNCS;
 		*functionsToSet = funcs;
 	} else {

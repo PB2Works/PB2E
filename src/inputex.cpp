@@ -159,7 +159,7 @@ static LRESULT CALLBACK inputWindowProc(HWND hwnd, UINT Message, WPARAM wParam, 
 	return DefWindowProc(hwnd, Message, wParam, lParam);
 }
 
-FREObject AS3_pollMouse(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(pollMouse) {
 	POINT mPoint;
 	RECT windowSize;
 	FREObject x, y;
@@ -176,7 +176,7 @@ FREObject AS3_pollMouse(FREContext ctx, void* funcData, uint32_t argc, FREObject
 }
 
 // keyDown, keyUp
-FREObject AS3_pollKeys(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(pollKeys) {
 	FREObject ex_n;
 	FREObject kev, kevs;
 	FREObject args[5];

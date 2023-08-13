@@ -53,58 +53,58 @@ inline FREObject getRawLuaValue(lua_State* L, int idx) {
 inline FREObject getLuaValue(lua_State* L, FREObject state, FREObject lo, int idx) {
 	/* LuaObject.make args
 	* argv[0] - this
-    * argv[1] - state (LuaState)
-    * argv[2] - type (int)
-    * argv[3] - value (internal AS3 representation of Lua value)
-    * argv[4] - index in the stack (only for non-primitive types so they could be referenced)
-    */
+	* argv[1] - state (LuaState)
+	* argv[2] - type (int)
+	* argv[3] - value (internal AS3 representation of Lua value)
+	* argv[4] - index in the stack (only for non-primitive types so they could be referenced)
+	*/
 	FREObject obj, argv[5], asException;
 	argv[0] = NULL;
 	argv[1] = state;
 	int type = lua_type(L, idx);
 	switch (type) {
-		case LUA_TBOOLEAN:
-			FRENewObjectFromInt32(type, &argv[2]);
-			FRENewObjectFromBool(lua_toboolean(L, idx), &argv[3]);
-			FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
-			break;
-		case LUA_TNUMBER:
-			if (lua_isinteger(L, idx)) {
-				FRENewObjectFromInt32(LAS3_TYPE_INT, &argv[2]);
-				FRENewObjectFromInt32(lua_tointeger(L, idx), &argv[3]);
-				// printf("[LUA] ---- Passing integer at index %d with value %d\n", idx, lua_tointeger(L, idx));
-			}
-			else {
-				FRENewObjectFromInt32(type, &argv[2]);
-				FRENewObjectFromDouble(lua_tonumber(L, idx), &argv[3]);
-			}
-			if (FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException) != FRE_OK) {
-				FREObject ex2, eMsg;
-				uint32_t msgl;
-				const uint8_t* eMsgs;
-				FREGetObjectProperty(asException, _AIRS("message"), &eMsg, &ex2);
-				FREGetObjectAsUTF8(eMsg, &msgl, &eMsgs);
-				printf("[LUA] LuaObject.make error: %s\n", eMsgs);
-			}
-			break;
-		case LUA_TSTRING: {
-			FRENewObjectFromInt32(type, &argv[2]);
-			const char* str = lua_tostring(L, idx);
-			FRENewObjectFromUTF8(strlen(str), _AIRS(str), &argv[3]);
-			FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
-			break;
+	case LUA_TBOOLEAN:
+		FRENewObjectFromInt32(type, &argv[2]);
+		FRENewObjectFromBool(lua_toboolean(L, idx), &argv[3]);
+		FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
+		break;
+	case LUA_TNUMBER:
+		if (lua_isinteger(L, idx)) {
+			FRENewObjectFromInt32(LAS3_TYPE_INT, &argv[2]);
+			FRENewObjectFromInt32(lua_tointeger(L, idx), &argv[3]);
+			// printf("[LUA] ---- Passing integer at index %d with value %d\n", idx, lua_tointeger(L, idx));
 		}
-		case LUA_TNIL:
+		else {
 			FRENewObjectFromInt32(type, &argv[2]);
-			argv[3] = NULL;
-			FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
-			break;
-		default:
-			FRENewObjectFromInt32(type, &argv[2]);
-			argv[3] = NULL;
-			FRENewObjectFromInt32(idx, &argv[4]);
-			FRECallObjectMethod(lo, _AIRS("call"), 5, argv, &obj, &asException);
-			break;
+			FRENewObjectFromDouble(lua_tonumber(L, idx), &argv[3]);
+		}
+		if (FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException) != FRE_OK) {
+			FREObject ex2, eMsg;
+			uint32_t msgl;
+			const uint8_t* eMsgs;
+			FREGetObjectProperty(asException, _AIRS("message"), &eMsg, &ex2);
+			FREGetObjectAsUTF8(eMsg, &msgl, &eMsgs);
+			printf("[LUA] LuaObject.make error: %s\n", eMsgs);
+		}
+		break;
+	case LUA_TSTRING: {
+		FRENewObjectFromInt32(type, &argv[2]);
+		const char* str = lua_tostring(L, idx);
+		FRENewObjectFromUTF8(strlen(str), _AIRS(str), &argv[3]);
+		FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
+		break;
+	}
+	case LUA_TNIL:
+		FRENewObjectFromInt32(type, &argv[2]);
+		argv[3] = NULL;
+		FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException);
+		break;
+	default:
+		FRENewObjectFromInt32(type, &argv[2]);
+		argv[3] = NULL;
+		FRENewObjectFromInt32(idx, &argv[4]);
+		FRECallObjectMethod(lo, _AIRS("call"), 5, argv, &obj, &asException);
+		break;
 	}
 	return obj;
 }
@@ -146,7 +146,7 @@ inline int pushAS3Value(lua_State* L, FREObject value) {
 		lua_pushstring(L, (const char*)vStr);
 		break;
 	}
-	// Just make sure to create userdata in the right order
+					// Just make sure to create userdata in the right order
 	case LUA_TUSERDATA: { // Assuming the userdata is on the stack (which it should be)
 		/*FREObject asIdx;
 		int idx;
@@ -180,7 +180,7 @@ inline void lua_prep(lua_State* L, FREContext ctx) {
 * argv[1]  - Registry ID (int)
 * argv[2+] - args        (LuaObject)
 */
-FREObject AS3_LUA_CallRegisteredFunction(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_CallRegisteredFunction) {
 	int Ln;
 	lua_State* L;
 	int rid;
@@ -242,7 +242,7 @@ inline int pushRawAS3Value(lua_State* L, FREObject value) {
 
 // API function responder (__AS3)
 int lua_AS3(lua_State* L) {
-	FREObject as3f, asException, *args, out;
+	FREObject as3f, asException, * args, out;
 	const char* lfn;
 	char* func;
 	int rets;
@@ -253,19 +253,19 @@ int lua_AS3(lua_State* L) {
 		luaextra* Le = *((luaextra**)lua_getextraspace(L));
 		lfn = lua_tostring(L, 1);
 		ismeta = lfn[0] == '0';
-		func = (char*) &lfn[ismeta];
+		func = (char*)&lfn[ismeta];
 		// printf("[LUA %d] Calling AS3 \"%s\" with %d args.\n", Le->Ln, func, argc - 1);
 		FREGetObjectProperty(Le->api, _AIRS(func), &as3f, &asException);
-		
+
 		argc++;
 		args = (FREObject*)malloc(sizeof(FREObject) * argc);
 		args[0] = NULL; // For AS3's Function.call, first argument is "this", so we put null
 		args[1] = Le->state;
 		if (ismeta) {
-			mobj = (luamobj*) lua_touserdata(L, 2);
+			mobj = (luamobj*)lua_touserdata(L, 2);
 			FRENewObjectFromInt32(mobj->id, &args[2]);
 		}
-		for (int i = 2 + ismeta; i < argc; i++) 
+		for (int i = 2 + ismeta; i < argc; i++)
 			args[i] = getLuaValue(L, Le->state, Le->lo, i);
 
 		if (FRECallObjectMethod(as3f, _AIRS("call"), argc, args, &out, &asException) != FRE_OK) {
@@ -293,7 +293,7 @@ int lua_AS3(lua_State* L) {
 *  argv[2] - Where     : String
 *  return  - Error     : String?
 */
-FREObject AS3_LUA_DoString(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_DoString) {
 	lua_State* L;
 	int Ln;
 	const char* code, * where;
@@ -316,7 +316,7 @@ FREObject AS3_LUA_DoString(FREContext ctx, void* funcData, uint32_t argc, FREObj
 	return ret;
 }
 
-FREObject AS3_LUA_RegisterArgument(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_RegisterArgument) {
 	if (argc >= 2) {
 		FREObject asRid;
 		int32_t Ln, idx;
@@ -340,7 +340,7 @@ FREObject AS3_LUA_RegisterArgument(FREContext ctx, void* funcData, uint32_t argc
 *  argv[0] - Lua state : int
 *  argv[1] - Classname : String
 */
-FREObject AS3_LUA_RegisterGlobalMetatable(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_RegisterGlobalMetatable) {
 	if (argc >= 2) {
 		lua_State* L;
 		int Ln;
@@ -351,8 +351,8 @@ FREObject AS3_LUA_RegisterGlobalMetatable(FREContext ctx, void* funcData, uint32
 
 		L = luaStates[Ln];
 		printf("%d Registering global metatable: \"%s\"\n", lua_gettop(L), className);
-		luaL_newmetatable(L, (const char*) className);
-		lua_getglobal(L, (const char*) className);
+		luaL_newmetatable(L, (const char*)className);
+		lua_getglobal(L, (const char*)className);
 		lua_pushstring(L, "__index");
 		lua_rawget(L, -2);
 		lua_pushstring(L, "__index");
@@ -366,8 +366,8 @@ FREObject AS3_LUA_RegisterGlobalMetatable(FREContext ctx, void* funcData, uint32
 		lua_pushvalue(L, -2);
 		lua_rawset(L, -5);
 		lua_pop(L, 3);
-	} 
-	return NULL; 
+	}
+	return NULL;
 }
 
 // TODO: Think of a system of storing arbitrary data in userdata. For now, only use ID
@@ -377,7 +377,7 @@ FREObject AS3_LUA_RegisterGlobalMetatable(FREContext ctx, void* funcData, uint32
 *  argv[1] - Classname : String
 *  argv[2] - id        : int
 */
-FREObject AS3_LUA_NewMetaObject(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_NewMetaObject) {
 	FREObject asId;
 	if (argc >= 3) {
 		lua_State* L;
@@ -391,19 +391,20 @@ FREObject AS3_LUA_NewMetaObject(FREContext ctx, void* funcData, uint32_t argc, F
 		FREGetObjectAsInt32(argv[2], &id);
 
 		L = luaStates[Ln];
-		mobj = (luamobj*) lua_newuserdata(L, sizeof(luamobj));
+		mobj = (luamobj*)lua_newuserdata(L, sizeof(luamobj));
 		mobj->id = id;
-		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int) mobj, lua_gettop(L));
-		luaL_setmetatable(L, (const char*) className);
+		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int)mobj, lua_gettop(L));
+		luaL_setmetatable(L, (const char*)className);
 		FRENewObjectFromInt32(1, &asId);
 		// lua_pop(L, 1);
-	} else {
+	}
+	else {
 		FRENewObjectFromInt32(0, &asId);
 	}
 	return asId;
 }
 
-FREObject AS3_LUA(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA) {
 	FREObject as3int;
 	lua_State* L;
 	luaextra* Le;
@@ -428,7 +429,7 @@ FREObject AS3_LUA(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[
 	return as3int;
 }
 
-FREObject AS3_LUA_Close(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_Close) {
 	int Ln;
 	lua_State* L;
 	luaextra* Le;
@@ -437,7 +438,7 @@ FREObject AS3_LUA_Close(FREContext ctx, void* funcData, uint32_t argc, FREObject
 		L = luaStates[Ln];
 		Le = *((luaextra**)lua_getextraspace(L));
 		if (Ln >= 0 && Ln < LAS3_MAX_STATES && (L != NULL)) {
-			printf("[LUA %d] Closing... %d == %d\n", Le->Ln, (int) Le->ctx, (int) ctx);
+			printf("[LUA %d] Closing... %d == %d\n", Le->Ln, (int)Le->ctx, (int)ctx);
 			lua_close(L);
 			free(Le);
 			luaStates[Ln] = NULL;
@@ -446,15 +447,15 @@ FREObject AS3_LUA_Close(FREContext ctx, void* funcData, uint32_t argc, FREObject
 	return NULL;
 }
 
-FREObject AS3_LUA_GetError(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_GetError) {
 	return NULL;
 }
 
-FREObject AS3_LUA_SetGlobal(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_SetGlobal) {
 	return NULL;
 }
 
-FREObject AS3_LUA_GetGlobal(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_GetGlobal) {
 	if (argc >= 2) {
 		lua_State* L;
 		int Ln;
@@ -471,7 +472,7 @@ FREObject AS3_LUA_GetGlobal(FREContext ctx, void* funcData, uint32_t argc, FREOb
 	return NULL;
 }
 
-FREObject AS3_LUA_CallFunction(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(LUA_CallFunction) {
 	return NULL;
 }
 

@@ -22,8 +22,8 @@ bool initialized = false;
 struct timeval select_timeout;
 WSADATA wsa;
 
-static void net_setdestinaton(as3socket &sock, const char* ip, int port) {
-	sockaddr_in &si = sock.si_server;
+static void net_setdestinaton(as3socket& sock, const char* ip, int port) {
+	sockaddr_in& si = sock.si_server;
 	if (sock.connected) return;
 
 	printf("[net_setdestinaton] %s:%d\n", ip, port);
@@ -39,7 +39,7 @@ static inline void net_freesocket(as3socket& sock) {
 	closesocket(sock.s);
 }
 
-FREObject AS3_NET_newUDPSocket(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(NET_newUDPSocket) {
 	int id;
 	FREObject as3_id;
 	as3socket* sock;
@@ -65,12 +65,12 @@ FREObject AS3_NET_newUDPSocket(FREContext ctx, void* funcData, uint32_t argc, FR
 			printf("[NET] New socket: %d\n", id);
 		}
 	}
-	
+
 	FRENewObjectFromInt32(id, &as3_id);
 	return as3_id;
 }
 
-FREObject AS3_NET_closeUDPSocket(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(NET_closeUDPSocket) {
 	int id;
 	FREGetObjectAsInt32(argv[0], &id);
 
@@ -82,15 +82,13 @@ FREObject AS3_NET_closeUDPSocket(FREContext ctx, void* funcData, uint32_t argc, 
 	return NULL;
 }
 
-FREObject AS3_NET_PollUDP(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(NET_PollUDP) {
 	int id;
 	as3socket* sock;
-	char *buffer;
 	sockaddr_in from;
-	int fromlen = sizeof(from);
+	int fromlen;
 	int result;
 	FREObject asException;
-	FREObject as3_socket;
 	FREObject as3_firedata;
 	FREObject as3_firedata_args[2];
 	FREObject as3_byteArray;
@@ -103,46 +101,40 @@ FREObject AS3_NET_PollUDP(FREContext ctx, void* funcData, uint32_t argc, FREObje
 
 	if (!sock->connected) return NULL;
 
-	as3_socket = argv[1];
 	as3_firedata = argv[2];
+	as3_firedata_args[0] = argv[1]; // Reference to calling NativeDatagramSocket
 
+	fromlen = sizeof(from);
 	while (1) {
 		result = select(sock->s + 1, &sock->readfds, NULL, NULL, &select_timeout);
 		if (result == SOCKET_ERROR) {
 			printf("[AS3_NET_PollUDP] select: error: %d\n", WSAGetLastError());
 			return NULL;
-		} else if (result == 0) {
+		}
+		else if (result == 0) {
 			FD_SET(sock->s, &sock->readfds);
 			break;
 		}
-		
-		buffer = (char*)malloc(sizeof(char) * BUFFER_SIZE);
-		result = recvfrom(sock->s, buffer, BUFFER_SIZE, 0, (sockaddr*)&from, &fromlen);
 
+		FRENewObjectFromInt32(BUFFER_SIZE, &as3_length);
+		FRENewObject(_AIRS("flash.utils.ByteArray"), 0, NULL, &as3_byteArray, &asException);
+		FRESetObjectProperty(as3_byteArray, _AIRS("length"), as3_length, &asException);
+		FREAcquireByteArray(as3_byteArray, &byteArray);
+		result = recvfrom(sock->s, (char*)byteArray.bytes, BUFFER_SIZE, 0, (sockaddr*)&from, &fromlen);
+		FREReleaseByteArray(as3_byteArray);
 		if (result != SOCKET_ERROR) {
-			if (from.sin_addr.s_addr != sock->si_server.sin_addr.s_addr) return NULL;
-
-			FRENewObjectFromInt32(BUFFER_SIZE, &as3_length);
-			FRENewObject(_AIRS("flash.utils.ByteArray"), 0, NULL, &as3_byteArray, &asException);
-			FRESetObjectProperty(as3_byteArray, _AIRS("length"), as3_length, &asException);
-			FREAcquireByteArray(as3_byteArray, &byteArray);
-			memcpy(byteArray.bytes, buffer, BUFFER_SIZE);
-			FREReleaseByteArray(as3_byteArray);
-
-			as3_firedata_args[0] = as3_socket;
+			if (from.sin_addr.s_addr != sock->si_server.sin_addr.s_addr) {
+				continue;
+			}
 			as3_firedata_args[1] = as3_byteArray;
 			FRECallObjectMethod(as3_firedata, _AIRS("call"), 2, as3_firedata_args, &as3_result, &asException);
-
-
-			//buffer[result] = 0;
-			//printf("[AS3_NET_PollUDP] Data: %s\n", buffer);
-		} else free(buffer);
+		}
 	}
 
 	return NULL;
 }
 
-FREObject AS3_NET_SendUDP(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
+ANEFunction(NET_SendUDP) {
 	FREByteArray byteArray;
 	int id;
 	int offset;
@@ -153,43 +145,25 @@ FREObject AS3_NET_SendUDP(FREContext ctx, void* funcData, uint32_t argc, FREObje
 	uint8_t* data;
 	int sent_length;
 
-	if (FREGetObjectAsInt32(argv[0], &id) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 0\n");
-		return NULL;
-	}
-	if (FREAcquireByteArray(argv[1], &byteArray) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 1\n");
-		return NULL;
-	}
-	if (FREGetObjectAsInt32(argv[2], &offset) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 2\n");
-		return NULL;
-	}
-	if (FREGetObjectAsInt32(argv[3], &length) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 3\n");
-		return NULL;
-	}
-	if (FREGetObjectAsUTF8(argv[4], &address_length, (const uint8_t**)&address) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 4\n");
-		return NULL;
-	}
-	if (FREGetObjectAsInt32(argv[5], &port) != FRE_OK) {
-		printf("[AS3_NET_SendUDP] Error 5\n");
-		return NULL;
-	}
+	_AIRCHECK(FREGetObjectAsInt32(argv[0], &id), "[AS3_NET_SendUDP] Error 0");
+	_AIRCHECK(FREAcquireByteArray(argv[1], &byteArray), "[AS3_NET_SendUDP] Error 1");
+	_AIRCHECK(FREGetObjectAsInt32(argv[2], &offset), "[AS3_NET_SendUDP] Error 2");
+	_AIRCHECK(FREGetObjectAsInt32(argv[3], &length), "[AS3_NET_SendUDP] Error 3");
+	_AIRCHECK(FREGetObjectAsUTF8(argv[4], &address_length, (const uint8_t**)&address), "[AS3_NET_SendUDP] Error 4");
+	_AIRCHECK(FREGetObjectAsInt32(argv[5], &port), "[AS3_NET_SendUDP] Error 5");
 
 	net_setdestinaton(sockets[id], address, port);
 
 	// printf("[AS3_NET_SendUDP] Sending %d bytes.\n", length);
 	data = byteArray.bytes;
-	sendto(sockets[id].s, (char*) data, length, 0, (sockaddr*) &sockets[id].si_server, sizeof(sockets[0].si_server));
+	sendto(sockets[id].s, (char*)data, length, 0, (sockaddr*)&sockets[id].si_server, sizeof(sockets[0].si_server));
 
 	FREReleaseByteArray(argv[1]);
 	return NULL;
 }
 
-FREObject AS3_NET_DNS(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]) {
-	const char *domain;
+ANEFunction(NET_DNS) {
+	const char* domain;
 	uint32_t domain_length;
 	int result;
 	struct addrinfo* allDomains;
@@ -197,7 +171,7 @@ FREObject AS3_NET_DNS(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 	sockaddr_in ipv4;
 	char* output;
 
-	if (FREGetObjectAsUTF8(argv[0], &domain_length, (const uint8_t**) &domain) != FRE_OK) {
+	if (FREGetObjectAsUTF8(argv[0], &domain_length, (const uint8_t**)&domain) != FRE_OK) {
 		return NULL;
 	}
 
@@ -207,9 +181,10 @@ FREObject AS3_NET_DNS(FREContext ctx, void* funcData, uint32_t argc, FREObject a
 		ipv4 = *((sockaddr_in*)allDomains[0].ai_addr);
 		output = (char*)malloc(sizeof(char) * 64);
 		inet_ntop(AF_INET, &(ipv4.sin_addr), output, 64);
-		FRENewObjectFromUTF8(strlen(output), (uint8_t*) output, &as3_ip);
+		FRENewObjectFromUTF8(strlen(output), (uint8_t*)output, &as3_ip);
 		return as3_ip;
-	} else {
+	}
+	else {
 		printf("[AS3_NET_DNS] getaddrinfo couldn't find domain %s. Error: %d\n", domain, result);
 	}
 
