@@ -126,6 +126,9 @@
     <ClCompile Include="src\lzio.c">
       <Filter>Lua</Filter>
     </ClCompile>
+    <ClCompile Include="src\net.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">
@@ -222,6 +225,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\main.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\net.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

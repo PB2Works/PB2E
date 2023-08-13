@@ -2,10 +2,11 @@
 #include <malloc.h>
 #include <sapi.h>
 #include <timeapi.h>
+#include <stdio.h>
 #include "main.h"
 #include "inputex.h"
 #include "as3lua.h"
-#include <stdio.h>
+#include "net.h"
 
 HWND main_window;
 FREContext fre_ctx;
@@ -29,7 +30,7 @@ FREObject AS3_setStageSize(FREContext ctx, void* funcData, uint32_t argc, FREObj
 	if (argc >= 2) {
 		FREGetObjectAsDouble(argv[0], &stageWidth);
 		FREGetObjectAsDouble(argv[1], &stageHeight);
-		printf("setStageSize: %lfx%lf\n", stageWidth, stageHeight);
+		printf("[ANE] setStageSize: %lfx%lf\n", stageWidth, stageHeight);
 	}
 	return NULL;
 }
@@ -67,7 +68,7 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 #define A3F(id, fname, func) funcs[id].name = _AIRS(fname); \
 							 funcs[id].functionData = NULL; \
 							 funcs[id].function = &func
-#define NUM_AS3_FUNCS 17
+#define NUM_AS3_FUNCS 22
 	FRENamedFunction* funcs = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * NUM_AS3_FUNCS);
 	if (funcs != NULL) {
 		A3F(0, "pollMouse", AS3_pollMouse);
@@ -87,6 +88,11 @@ void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, u
 		A3F(14, "perfFrequency", AS3_getPerformanceFrequency);
 		A3F(15, "t1", AS3_startMeasure);
 		A3F(16, "t2", AS3_stopMeasure);
+		A3F(17, "NET_NewUDP", AS3_NET_newUDPSocket);
+		A3F(18, "NET_CloseUDP", AS3_NET_closeUDPSocket);
+		A3F(19, "NET_PollUDP", AS3_NET_PollUDP);
+		A3F(20, "NET_SendUDP", AS3_NET_SendUDP);
+		A3F(21, "NET_DNS", AS3_NET_DNS);
 		*numFunctionsToSet = NUM_AS3_FUNCS;
 		*functionsToSet = funcs;
 	} else {
@@ -122,19 +128,20 @@ static void emain() {
 #ifdef HAS_CONSOLE
 		SetupConsole();
 #endif
-	printf("ANE initialized\n");
+	printf("[ANE] Begin\n");
 	main_window = NULL;
 	EnumThreadWindows(GetCurrentThreadId(), enumWindowCallback, NULL);
 	if (main_window != NULL) {
 		// main_wproc = (WNDPROC)SetWindowLongA(main_window, GWL_WNDPROC, (long)NewWindowProc);
 		inputex_init(fre_ctx);
 		lua_init(fre_ctx);
+		net_init(fre_ctx);
 #ifdef HAS_CONSOLE
 		SetForegroundWindow(main_window);
 #endif
 	}
 	else {
-		printf("ERROR: COULDN'T FIND CONTENT WINDOW.");
+		printf("[ANE] ERROR: COULDN'T FIND CONTENT WINDOW.");
 	}
 }
 
@@ -145,8 +152,8 @@ void extensionInitializer(void** extData, FREContextInitializer* ctxInitializer,
 }
 
 void extensionFinalizer(void* extData) {
-	// TODO: Properly close threads (send a close message & wait)
-	inputex_close();
+	inputex_close(); // TODO: Properly close threads (send a close message & wait)
 	lua_close();
+	net_close();
 	FreeConsole();
 }

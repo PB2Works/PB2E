@@ -47,6 +47,7 @@
     <ClCompile Include="src\lutf8lib.c" />
     <ClCompile Include="src\lvm.c" />
     <ClCompile Include="src\lzio.c" />
+    <ClCompile Include="src\net.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ane.h" />
@@ -81,6 +82,7 @@
     <ClInclude Include="src\lvm.h" />
     <ClInclude Include="src\lzio.h" />
     <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\net.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{44A49CFF-311C-42B1-983E-158E3AA0CC55}</ProjectGuid>

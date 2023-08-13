@@ -16,6 +16,7 @@ package com.pb2works
 		public function PB2E(main:MovieClip) {
 			this.stage = main.stage;
 			this.main = main;
+			trace("[PB2E] Creating extension");
 			ctx = ExtensionContext.createExtensionContext("com.pb2works.PB2E", null);
 			ctx.addEventListener(StatusEvent.STATUS, function(ev:StatusEvent) : void {
 				if (ev.code == "key") {

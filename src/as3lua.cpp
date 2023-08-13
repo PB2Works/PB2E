@@ -1,6 +1,6 @@
 #include <windows.h>
-#include "as3lua.h"
 #include "lua.hpp"
+#include "as3lua.h"
 
 // lua types : nil (VAL), boolean (VAL), number (VAL), string (VAL), table (REF), function (REF), userdata (REF), thread (REF)
 
@@ -475,7 +475,6 @@ FREObject AS3_LUA_CallFunction(FREContext ctx, void* funcData, uint32_t argc, FR
 	return NULL;
 }
 
-DWORD WINAPI THREAD_Lua(void* vargp);
 void lua_init(FREContext ctx) {
 	FREObject actionScriptData, vect, asException, asInt;
 	for (int i = 0; i < LAS3_MAX_STATES; i++) luaStates[i] = NULL;
