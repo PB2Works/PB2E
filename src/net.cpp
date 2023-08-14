@@ -169,7 +169,7 @@ ANEFunction(NET_DNS) {
 	struct addrinfo* allDomains;
 	FREObject as3_ip;
 	sockaddr_in ipv4;
-	char* output;
+	char output[32];
 
 	if (FREGetObjectAsUTF8(argv[0], &domain_length, (const uint8_t**)&domain) != FRE_OK) {
 		return NULL;
@@ -179,8 +179,7 @@ ANEFunction(NET_DNS) {
 
 	if (!result) {
 		ipv4 = *((sockaddr_in*)allDomains[0].ai_addr);
-		output = (char*)malloc(sizeof(char) * 64);
-		inet_ntop(AF_INET, &(ipv4.sin_addr), output, 64);
+		inet_ntop(AF_INET, &(ipv4.sin_addr), output, 32);
 		FRENewObjectFromUTF8(strlen(output), (uint8_t*)output, &as3_ip);
 		return as3_ip;
 	}

@@ -79,12 +79,12 @@ inline FREObject getLuaValue(lua_State* L, FREObject state, FREObject lo, int id
 			FRENewObjectFromDouble(lua_tonumber(L, idx), &argv[3]);
 		}
 		if (FRECallObjectMethod(lo, _AIRS("call"), 4, argv, &obj, &asException) != FRE_OK) {
-			FREObject ex2, eMsg;
-			uint32_t msgl;
-			const uint8_t* eMsgs;
-			FREGetObjectProperty(asException, _AIRS("message"), &eMsg, &ex2);
-			FREGetObjectAsUTF8(eMsg, &msgl, &eMsgs);
-			printf("[LUA] LuaObject.make error: %s\n", eMsgs);
+			FREObject asException2, asExceptionMessage;
+			uint32_t asExceptionMessageLength;
+			const uint8_t* asExceptionString;
+			FREGetObjectProperty(asException, _AIRS("message"), &asExceptionMessage, &asException2);
+			FREGetObjectAsUTF8(asExceptionMessage, &asExceptionMessageLength, &asExceptionString);
+			printf("[LUA] LuaObject.make error: %s\n", asExceptionString);
 		}
 		break;
 	case LUA_TSTRING: {
@@ -403,7 +403,7 @@ ANEFunction(LUA_NewMetaObject) {
 		L = luaStates[Ln];
 		mobj = (luamobj*)lua_newuserdata(L, sizeof(luamobj));
 		mobj->id = id;
-		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int)mobj, lua_gettop(L));
+		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int) mobj, lua_gettop(L));
 		luaL_setmetatable(L, (const char*)className);
 		FRENewObjectFromInt32(1, &asId);
 		// lua_pop(L, 1);
@@ -490,12 +490,12 @@ void lua_init(FREContext ctx) {
 	FREObject actionScriptData, vect, asException, asInt;
 	for (int i = 0; i < LAS3_MAX_STATES; i++) luaStates[i] = NULL;
 
-	printf("[LUA INIT] 1: %d\n", FREGetContextActionScriptData(ctx, &actionScriptData));
-	printf("[LUA INIT] 2: %d\n", FRENewObjectFromUint32(LAS3_MAX_STATES, &asInt));
-	printf("[LUA INIT] 3: %d\n", FRENewObject(_AIRS("Vector.<flash.utils.Dictionary>"), 1, &asInt, &vect, &asException));
-	printf("[LUA INIT] 4: %d\n", FRESetObjectProperty(actionScriptData, _AIRS("lf"), vect, &asException));
-	printf("[LUA INIT] 5: %d\n", FRENewObject(_AIRS("Vector.<com.pb2works.lua.LuaState>"), 1, &asInt, &vect, &asException));
-	printf("[LUA INIT] 6: %d\n", FRESetObjectProperty(actionScriptData, _AIRS("ls"), vect, &asException));
+	FREGetContextActionScriptData(ctx, &actionScriptData);
+	FRENewObjectFromUint32(LAS3_MAX_STATES, &asInt);
+	FRENewObject(_AIRS("Vector.<flash.utils.Dictionary>"), 1, &asInt, &vect, &asException);
+	FRESetObjectProperty(actionScriptData, _AIRS("lf"), vect, &asException);
+	FRENewObject(_AIRS("Vector.<com.pb2works.lua.LuaState>"), 1, &asInt, &vect, &asException);
+	FRESetObjectProperty(actionScriptData, _AIRS("ls"), vect, &asException);
 }
 
 void lua_close() {
