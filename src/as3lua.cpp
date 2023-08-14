@@ -113,9 +113,19 @@ inline FREObject getLuaValue(lua_State* L, FREObject state, FREObject lo, int id
 // Returns: # of argumenets (preferrably 0 or 1)
 inline int pushAS3Value(lua_State* L, FREObject value) {
 	FREObject asException, prop, propt;
+	FREObjectType asType;
 	int valueType;
-	FREGetObjectProperty(value, _AIRS("t"), &propt, &asException);
-	FREGetObjectAsInt32(propt, &valueType);
+	int result;
+	if (value == 0) {
+		valueType = LUA_TNIL;
+	} else {
+		FREGetObjectType(value, &asType);
+		if (asType != FRE_TYPE_OBJECT) valueType = LUA_TNIL;
+		else {
+			result = FREGetObjectProperty(value, _AIRS("t"), &propt, &asException);
+			FREGetObjectAsInt32(propt, &valueType);
+		}
+	}
 	switch (valueType) {
 	case LUA_TBOOLEAN: {
 		uint32_t vBool;
