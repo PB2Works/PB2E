@@ -168,7 +168,7 @@ inline int pushAS3Value(lua_State* L, FREObject value) {
 		FREGetObjectProperty(value, _AIRS("idx"), &asIdx, &asException);
 		FREGetObjectAsInt32(asIdx, &idx);
 		lua_insert(L, idx);*/
-		printf("RETURNING USERDATA.... %d\n", lua_gettop(L));
+		// printf("RETURNING USERDATA.... %d\n", lua_gettop(L));
 		break;
 	}
 	default:
@@ -408,7 +408,7 @@ ANEFunction(LUA_NewMetaObject) {
 		L = luaStates[Ln];
 		mobj = (luamobj*)lua_newuserdata(L, sizeof(luamobj));
 		mobj->id = id;
-		printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int) mobj, lua_gettop(L));
+		// printf("+++++++++ NEW META OBJECT: %ld & %d\n", (int) mobj, lua_gettop(L));
 		luaL_setmetatable(L, (const char*)className);
 		FRENewObjectFromInt32(1, &asId);
 		// lua_pop(L, 1);
