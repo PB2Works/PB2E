@@ -2,7 +2,16 @@
 #include "lua.hpp"
 #include "as3lua.h"
 
-// lua types : nil (VAL), boolean (VAL), number (VAL), string (VAL), table (REF), function (REF), userdata (REF), thread (REF)
+// lua types: 
+//   Primitive (passed by value):   nil,   boolean,  number,   string
+//   Complex (passed by reference): table, function, userdata, thread
+// number is interesting because it can be either a double or an int internally (i.e. 2 types that show as 1)
+// question: Should C convert AS3 primitives (undefined, null, Number, int/uint, Boolean) to Lua primities (nil, boolean, number, string)?
+//           And what about the other way (Lua primitive -> AS3 primitive) in LUA API arguments?
+
+#define LAS3_REG_NAME "pb2wr"
+#define LAS3_TYPE_INT 13
+#define LAS3_MAX_STATES 10
 
 struct luaextra {
 	int Ln;            // The index of the state in the luaStates array
@@ -10,7 +19,6 @@ struct luaextra {
 	FREObject asData;  // actionScriptData - (store AS3 objects here that you don't want GC'ed [or not])
 	FREObject state;   // The AS3 LuaState instance
 	FREObject api;     // Lua API functions
-	FREObject uf;
 	FREObject lo;      // Lua object constructor
 	FREObject mt;      // Reference to MainTimeline
 };
@@ -20,9 +28,6 @@ struct luamobj {
 	int id; // Internal ID of object (player, region, moveable, etc.)
 };
 
-#define LAS3_REG_NAME "pb2wr"
-#define LAS3_TYPE_INT 13
-#define LAS3_MAX_STATES 10
 static lua_State* luaStates[LAS3_MAX_STATES];
 
 // Lua native value -> AS3 native type
@@ -251,8 +256,8 @@ inline int pushRawAS3Value(lua_State* L, FREObject value) {
 }
 
 // API function responder (__AS3)
-int lua_AS3(lua_State* L) {
-	FREObject as3f, asException, * args, out;
+static int lua_AS3(lua_State* L) {
+	FREObject as3f, asException, *args, out;
 	const char* lfn;
 	char* func;
 	int rets;

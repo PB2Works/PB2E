@@ -17,10 +17,10 @@ typedef struct {
 	fd_set readfds;
 } as3socket;
 
-as3socket sockets[MAX_SOCKETS];
-bool initialized = false;
-struct timeval select_timeout;
-WSADATA wsa;
+static as3socket sockets[MAX_SOCKETS];
+static bool initialized = false;
+static struct timeval select_timeout;
+static WSADATA wsa;
 
 static void net_setdestinaton(as3socket& sock, const char* ip, int port) {
 	sockaddr_in& si = sock.si_server;
