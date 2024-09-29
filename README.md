@@ -1,4 +1,4 @@
-# PB2E
+# PB2Works Expanded PB2 AIR Native Extension
 
 Plazma Burst 2 Expanded Extension ANE (WIP)
 Current featues:
@@ -8,7 +8,7 @@ Current featues:
 
 ## Prerequisites
 
-1. make (on Windows, you can get it using [Chocolatey](https://chocolatey.org)
+1. make (on Windows, you can get it using [Chocolatey](https://chocolatey.org) or [Mingw](https://nim-lang.org/download/mingw64.7z)
 
 ## How to build
 
